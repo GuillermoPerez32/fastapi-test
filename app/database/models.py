@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Table
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from app.database import Base
+from app.mixins import SoftDeleteMixin, TimestampMixin
 
 post_tag_table = Table(
     "post_tag",
@@ -10,7 +11,7 @@ post_tag_table = Table(
     Column("tag_id", Integer, ForeignKey("tags.id"), primary_key=True),
 )
 
-class User(Base, AsyncAttrs):
+class User(TimestampMixin, SoftDeleteMixin, Base, AsyncAttrs):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -20,7 +21,7 @@ class User(Base, AsyncAttrs):
 
     posts = relationship("Post", back_populates="author")
 
-class Post(Base, AsyncAttrs):
+class Post(TimestampMixin, SoftDeleteMixin, Base, AsyncAttrs):
     __tablename__ = "posts"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -31,7 +32,7 @@ class Post(Base, AsyncAttrs):
     author = relationship("User", back_populates="posts")
     tags = relationship("Tag", secondary=post_tag_table, back_populates="posts")
 
-class Tag(Base, AsyncAttrs):
+class Tag(TimestampMixin, SoftDeleteMixin, Base, AsyncAttrs):
     __tablename__ = "tags"
 
     id = Column(Integer, primary_key=True, index=True)
