@@ -11,6 +11,7 @@ post_tag_table = Table(
     Column("tag_id", Integer, ForeignKey("tags.id"), primary_key=True),
 )
 
+
 class User(TimestampMixin, SoftDeleteMixin, Base, AsyncAttrs):
     __tablename__ = "users"
 
@@ -21,6 +22,7 @@ class User(TimestampMixin, SoftDeleteMixin, Base, AsyncAttrs):
 
     posts = relationship("Post", back_populates="author")
 
+
 class Post(TimestampMixin, SoftDeleteMixin, Base, AsyncAttrs):
     __tablename__ = "posts"
 
@@ -30,7 +32,9 @@ class Post(TimestampMixin, SoftDeleteMixin, Base, AsyncAttrs):
     user_id = Column(Integer, ForeignKey("users.id"))
 
     author = relationship("User", back_populates="posts")
-    tags = relationship("Tag", secondary=post_tag_table, back_populates="posts")
+    tags = relationship("Tag", secondary=post_tag_table,
+                        back_populates="posts")
+
 
 class Tag(TimestampMixin, SoftDeleteMixin, Base, AsyncAttrs):
     __tablename__ = "tags"
@@ -38,4 +42,5 @@ class Tag(TimestampMixin, SoftDeleteMixin, Base, AsyncAttrs):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True, nullable=False)
 
-    posts = relationship("Post", secondary=post_tag_table, back_populates="tags")
+    posts = relationship("Post", secondary=post_tag_table,
+                         back_populates="tags")

@@ -19,31 +19,39 @@ router = APIRouter()
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 class Token(BaseModel):
     access_token: str
     token_type: str
+
 
 class BaseUser(BaseModel):
     username: str
     email: str
 
+
 class UserInDB(BaseUser):
     hashed_password: str
+
 
 class UserCreate(BaseModel):
     username: str
     email: str
     password: str
 
+
 class UserLogin(BaseModel):
     username: str
     password: str
 
+
 def get_password_hash(password):
     return pwd_context.hash(password)
 
+
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
+
 
 async def authenticate_user(db: Session, username: str, password: str):
     user = await get_user(db, username)
@@ -52,6 +60,7 @@ async def authenticate_user(db: Session, username: str, password: str):
     if not verify_password(password, user.password):
         return False
     return user
+
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
@@ -62,6 +71,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
 
 @router.post("/signup", response_model=BaseUser)
 async def signup(user: UserCreate, db: AsyncSession = Depends(get_session)):
@@ -81,6 +91,7 @@ async def signup(user: UserCreate, db: AsyncSession = Depends(get_session)):
     await db.commit()
     await db.refresh(db_user)
     return db_user
+
 
 @router.post("/login")
 async def login_for_access_token(

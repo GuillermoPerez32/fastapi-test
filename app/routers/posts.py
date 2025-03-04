@@ -9,14 +9,17 @@ from pydantic import BaseModel
 from app.database.models import Post, User, Tag
 from app.auth import get_current_user
 
+
 class PostTag(BaseModel):
     id: int
     name: str
+
 
 class BasePost(BaseModel):
     title: str
     content: str
     tags: List[PostTag] = []
+
 
 class PostResponse(BasePost):
     id: int
@@ -28,15 +31,18 @@ class PostCreate(BaseModel):
     content: str
     tags: List[int]
 
+
 class PostUpdate(BaseModel):
     title: str | None
     content: str | None
     tags: List[int] | None
 
+
 router = APIRouter(
     prefix="/posts",
     tags=["Posts"]
 )
+
 
 @router.post("/", response_model=None)
 async def create_post(
@@ -62,11 +68,13 @@ async def create_post(
         tags=[PostTag(name=tag.name, id=tag.id) for tag in tags]
     )
 
+
 @router.get("/", response_model=List[BasePost])
 async def read_posts(skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_session)):
     posts_query = await db.execute(select(Post).options(selectinload(Post.tags)).offset(skip).limit(limit))
     posts = posts_query.scalars().all()
     return posts
+
 
 @router.get("/{post_id}", response_model=BasePost)
 async def read_post(post_id: int, db: AsyncSession = Depends(get_session)):
@@ -76,6 +84,7 @@ async def read_post(post_id: int, db: AsyncSession = Depends(get_session)):
         raise HTTPException(status_code=404, detail="Post not found")
     return post
 
+
 @router.put("/{post_id}", response_model=PostResponse)
 async def update_post(
     post_id: int, post: PostUpdate,
@@ -84,7 +93,7 @@ async def update_post(
 ):
     result = await db.execute(select(Post).options(selectinload(Post.tags))
                               .filter(Post.id == post_id, Post.user_id == current_user.id)
-    )
+                              )
     db_post = result.scalars().first()
     if db_post is None:
         raise HTTPException(status_code=404, detail="Post not found")
@@ -101,6 +110,7 @@ async def update_post(
         content=db_post.content,
         tags=[PostTag(name=tag.name, id=tag.id) for tag in tags]
     )
+
 
 @router.delete("/{post_id}", status_code=204)
 async def delete_post(

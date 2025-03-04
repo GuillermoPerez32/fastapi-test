@@ -11,13 +11,17 @@ from pydantic import BaseModel
 from app.database import User
 from sqlalchemy.sql import select
 
+
 class TokenData(BaseModel):
     username: str | None = None
 
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 
 async def get_user(db: Session, username: str):
     return (await db.execute(select(User).filter(User.username == username))).scalars().first()
+
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: AsyncSession = Depends(get_session)):
     credentials_exception = HTTPException(

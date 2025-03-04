@@ -3,14 +3,15 @@ from fastapi import Depends
 from app.database.database import get_session
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import select
-from sqlalchemy.orm import selectinload
 from typing import List
 from pydantic import BaseModel
 from app.database.models import User, Tag
 from app.auth import get_current_user
 
+
 class BaseTag(BaseModel):
     name: str
+
 
 class TagResponse(BaseTag):
     id: int
@@ -20,13 +21,16 @@ class TagResponse(BaseTag):
 class TagCreate(BaseModel):
     name: str
 
+
 class TagUpdate(BaseModel):
     name: str | None
+
 
 router = APIRouter(
     prefix="/tags",
     tags=["Tags"]
 )
+
 
 @router.post("/", response_model=None)
 async def create_tag(
@@ -46,11 +50,13 @@ async def create_tag(
         name=db_tag.name,
     )
 
+
 @router.get("/", response_model=List[BaseTag])
 async def read_tags(skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_session)):
     tags_query = await db.execute(select(Tag).offset(skip).limit(limit))
     tags = tags_query.scalars().all()
     return tags
+
 
 @router.get("/{tag_id}", response_model=BaseTag)
 async def read_tag(tag_id: int, db: AsyncSession = Depends(get_session)):
@@ -59,6 +65,7 @@ async def read_tag(tag_id: int, db: AsyncSession = Depends(get_session)):
     if post is None:
         raise HTTPException(status_code=404, detail="Tag not found")
     return post
+
 
 @router.put("/{tag_id}", response_model=TagResponse)
 async def update_tag(
@@ -78,6 +85,7 @@ async def update_tag(
         id=db_tag.id,
         name=db_tag.name
     )
+
 
 @router.delete("/{tag_id}", status_code=204)
 async def delete_tag(
