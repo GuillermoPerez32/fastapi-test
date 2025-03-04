@@ -76,7 +76,7 @@ async def read_post(post_id: int, db: AsyncSession = Depends(get_session)):
         raise HTTPException(status_code=404, detail="Post not found")
     return post
 
-@router.put("/{post_id}", response_model=BasePost)
+@router.put("/{post_id}", response_model=PostResponse)
 async def update_post(
     post_id: int, post: PostUpdate,
     db: AsyncSession = Depends(get_session),
