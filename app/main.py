@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from app.database.database import init_db
+from app.routers import users
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -9,6 +10,4 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-@app.get("/")
-async def root():
-    return {"message": "FastAPI CRUD Challenge"}
+app.include_router(users.router)
