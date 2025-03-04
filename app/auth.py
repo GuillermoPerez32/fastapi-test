@@ -3,6 +3,8 @@ from fastapi import Depends, HTTPException, status
 from typing import Annotated
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.database import get_session
 from app.env import SECRET_KEY, ALGORITHM
 import jwt
 from pydantic import BaseModel
@@ -17,7 +19,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 async def get_user(db: Session, username: str):
     return (await db.execute(select(User).filter(User.username == username))).scalars().first()
 
-async def get_current_user(db: Session, token: Annotated[str, Depends(oauth2_scheme)]):
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: AsyncSession = Depends(get_session)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -31,7 +33,7 @@ async def get_current_user(db: Session, token: Annotated[str, Depends(oauth2_sch
         token_data = TokenData(username=username)
     except InvalidTokenError:
         raise credentials_exception
-    user = get_user(db, username=token_data.username)
+    user = await get_user(db, username=token_data.username)
     if user is None:
         raise credentials_exception
     return user
