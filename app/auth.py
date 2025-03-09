@@ -8,7 +8,7 @@ from app.database import get_session
 from app.env import SECRET_KEY, ALGORITHM
 import jwt
 from pydantic import BaseModel
-from app.database import User
+from app.models import User
 from sqlalchemy.sql import select
 
 

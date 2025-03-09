@@ -5,37 +5,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import select
 from sqlalchemy.orm import selectinload
 from typing import List
-from pydantic import BaseModel
-from app.database.models import Post, User, Tag
+from app.models import Post, User, Tag
 from app.auth import get_current_user
-
-
-class PostTag(BaseModel):
-    id: int
-    name: str
-
-
-class BasePost(BaseModel):
-    title: str
-    content: str
-    tags: List[PostTag] = []
-
-
-class PostResponse(BasePost):
-    id: int
-    tags: List[PostTag]
-
-
-class PostCreate(BaseModel):
-    title: str
-    content: str
-    tags: List[int]
-
-
-class PostUpdate(BaseModel):
-    title: str | None
-    content: str | None
-    tags: List[int] | None
+from app.schemas.post import BasePost, PostCreate, PostResponse, PostTag, PostUpdate
 
 
 router = APIRouter(

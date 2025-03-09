@@ -1,6 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker, Session
-from fastapi import Depends
+from sqlalchemy.orm import sessionmaker
 from typing import AsyncGenerator
 
 from app.env import DATABASE_URL

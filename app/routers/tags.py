@@ -5,32 +5,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import select
 from sqlalchemy.orm import selectinload
 from typing import List
-from pydantic import BaseModel
-from app.database.models import User, Tag
+from app.models import User, Tag
 from app.auth import get_current_user
-
-
-class BaseTag(BaseModel):
-    name: str
-
-
-class TagResponse(BaseTag):
-    id: int
-    name: str
-
-
-class TagCreate(BaseModel):
-    name: str
-
-
-class TagUpdate(BaseModel):
-    name: str | None
-
-
-class TagPost(BaseModel):
-    id: int
-    title: str
-    content: str
+from app.schemas.tag import TagCreate, TagResponse, BaseTag, TagUpdate, TagPost
 
 
 router = APIRouter(

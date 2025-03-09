@@ -7,42 +7,18 @@ import jwt
 from passlib.context import CryptContext
 
 from sqlalchemy.orm import Session
-from sqlalchemy.sql import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.database import User, get_session
+from app.database import get_session
+from app.models import User
 from app.env import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 from app.auth import get_user
+from app.schemas.user import BaseUser, Token, UserCreate, UserLogin
 
 
 router = APIRouter()
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-class BaseUser(BaseModel):
-    username: str
-    email: str
-
-
-class UserInDB(BaseUser):
-    hashed_password: str
-
-
-class UserCreate(BaseModel):
-    username: str
-    email: EmailStr
-    password: str
-
-
-class UserLogin(BaseModel):
-    username: str
-    password: str
 
 
 def get_password_hash(password):
